@@ -22,13 +22,13 @@ def derivative_of_gaussian(size, sigma):  # DoG 필터 생성 함수
     for x in range(size):  # x for row
         for y in range(size):  # y for column
             # 시도한 방법 1: x,y 편미분한 식에 대입하여 나온 두 값을 더한 값으로 필터 값으로 사용해본 식
-            """DoG[x][y] = (-(mid-x) * np.exp(-((mid-x) ** 2 + (mid-y) ** 2) / (2 * sigma ** 2)) / sigma ** 2) + \
-                        (-(mid-y) * np.exp(-((mid-y) ** 2 + (mid-x) ** 2) / (2 * sigma ** 2)) / sigma ** 2)"""
-
+            DoG[x][y] = (-(mid-x) * np.exp(-((mid-x) ** 2 + (mid-y) ** 2) / (2 * sigma ** 2)) / sigma ** 2) + \
+                        (-(mid-y) * np.exp(-((mid-y) ** 2 + (mid-x) ** 2) / (2 * sigma ** 2)) / sigma ** 2)
+            # 결과는 방법 1이 더 깔끔해 보이는 결과가 나옴.
             # 시도한 방법 2: x,y 편미분한 식에 대입하여 나온 두 값으로 Magnitude 값을 구하여 필터 값으로 사용해본 식
-            DoG_x = (-(mid - x) * np.exp(-((mid - x) ** 2 + (mid - y) ** 2) / (2 * sigma ** 2)) / sigma ** 2)
+            """DoG_x = (-(mid - x) * np.exp(-((mid - x) ** 2 + (mid - y) ** 2) / (2 * sigma ** 2)) / sigma ** 2)
             DoG_y = (-(mid - y) * np.exp(-((mid - y) ** 2 + (mid - x) ** 2) / (2 * sigma ** 2)) / sigma ** 2)
-            DoG[x][y] = (DoG_y**2 + DoG_x**2) ** 0.5
+            DoG[x][y] = (DoG_y**2 + DoG_x**2) ** 0.5"""
     return DoG
 
 
@@ -38,17 +38,19 @@ def laplacian_of_gaussian(size, sigma):  # LoG 필터 생성 함수
     for x in range(size):  # x for row
         for y in range(size):  # y for column
             # 시도한 방법 1: x,y 편미분한 식에 대입하여 나온 두 값으로 Magnitude 값을 구하여 필터 값으로 사용해본 식
+            # sigma 값이 높을 때 방법1 결과가 나쁘지 않게 나온 것 처럼 보임.
             LoG_x = ((mid-x) ** 2 / sigma ** 4 - 1/sigma**2) * np.exp(-((mid-x) ** 2 + (mid-y) ** 2) / (2 * sigma ** 2))
             LoG_y = ((mid-y) ** 2 / sigma ** 4 - 1/sigma**2) * np.exp(-((mid-x) ** 2 + (mid-y) ** 2) / (2 * sigma ** 2))
-            # LoG[x][y] = (LoG_y**2 + LoG_x**2) ** 0.5
+            LoG[x][y] = (LoG_y**2 + LoG_x**2) ** 0.5
 
             # 시도한 방법 2: x,y 편미분한 식에 대입하여 나온 두 값을 더한 값으로 필터 값으로 사용해본 식
-            LoG[x][y] = LoG_y + LoG_x
+            # 방법2의 결과들은 평균적으로는 방법1보다는 덜 지저분해 보였음
+            # LoG[x][y] = LoG_y + LoG_x
     return LoG
 
 
 if __name__ == '__main__':
-    img = Image.open("./images/ho1.jpg")  # 1306 * 980, 이미지 로드
+    img = Image.open("./images/benalia.jpg")  # 이미지 로드
     pixel_array = np.array(img)  # 로딩한 이미지를 rgb 값의 배열로 변환
     my_kernel = [[2, 1, 0],
                 [1, 0, -1],
@@ -67,7 +69,7 @@ if __name__ == '__main__':
     get_DoG = False  # derivative of gaussian
     get_lap = False  # laplacian
     get_LoG = False  # laplacian of gaussian
-    get_LG = False   # Compute gaussian smoothing, then laplacian convolution.
+    get_LG = True   # Compute gaussian smoothing, then laplacian convolution.
     # ---------------------------------------------------------------
     if get_1d:
         """
